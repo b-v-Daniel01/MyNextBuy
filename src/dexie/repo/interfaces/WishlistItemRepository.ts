@@ -1,5 +1,3 @@
-import { NumericLiteral } from 'typescript';
-import { db } from '../../db';
 import { Wishlist } from '../../models/Wishlist';
 import { WishlistItem } from '../../models/WishlistItem';
 

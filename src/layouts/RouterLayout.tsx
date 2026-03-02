@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import { AppShell, Burger, Group, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { HeaderMenu } from '@/components/Header/Header';
 import { Navbar } from '../components/navbar/Navbar';
 
 export function RouterLayout() {
@@ -20,22 +21,12 @@ export function RouterLayout() {
       padding="md"
     >
       <AppShell.Header>
-        <Group h="100%" px="md">
-          {/* Rimuoviamo 'hiddenFrom' o 'visibleFrom' per rendere il burger SEMPRE presente */}
-          <Burger
-            opened={opened}
-            onClick={toggle}
-            size="sm"
-            color="blue" // Opzionale: per renderlo più visibile
-          />
-          <Text fw={700}>My Next Buy</Text>
-        </Group>
+        <HeaderMenu />
       </AppShell.Header>
 
-      <AppShell.Navbar>
-        {/* Passiamo toggle se vogliamo che la navbar si chiuda al click su mobile */}
+      {/* <AppShell.Navbar>
         <Navbar closeNavbar={toggle} />
-      </AppShell.Navbar>
+      </AppShell.Navbar> */}
 
       <AppShell.Main>
         <Outlet />

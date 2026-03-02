@@ -3,7 +3,8 @@ import '@mantine/core/styles.css';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { MantineProvider } from '@mantine/core';
 import { RouterLayout } from './layouts/RouterLayout';
-import { HomePage } from './pages/Home.page';
+import { HomePage } from './pages/Homepage/Home.page';
+import { Wishlists } from './pages/Wishlist/WishlistLists';
 import { theme } from './theme';
 
 export default function App() {
@@ -13,8 +14,8 @@ export default function App() {
         <Routes>
           <Route path="/" element={<RouterLayout />}>
             <Route index element={<HomePage />} />
-            <Route path="homepage" element={<HomePage />} />
-            <Route path="wishlists" element={<div>WishlistPage</div>} />
+            <Route path="*" element={<HomePage />} />
+            <Route path="wishlists" element={<Wishlists />} />
             <Route path="settings/account" element={<div>Account Setting page</div>} />
           </Route>
 

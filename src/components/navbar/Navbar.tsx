@@ -7,7 +7,7 @@ import classes from './navbar.module.css';
 const data = [
   { link: '/homepage', label: 'Homepage', icon: IconHome },
   { link: '/wishlists', label: 'Wishlists', icon: IconBellRinging },
-  { link: '/settings/account', label: 'Account', icon: IconReceipt2 },
+  { link: '/settings', label: 'Account', icon: IconReceipt2 },
 ];
 
 interface NavbarProps {

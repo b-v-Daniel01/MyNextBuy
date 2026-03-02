@@ -1,6 +1,6 @@
 import { WishlistItem } from '@/dexie/models/WishlistItem';
 
-export interface WishlistItemService {
+export interface IWishlistItemService {
   findByWishlistId: (id: number) => Promise<WishlistItem | undefined>; // Dexie può ritornare undefined se non trova nulla
   getAll: () => Promise<WishlistItem[]>;
 

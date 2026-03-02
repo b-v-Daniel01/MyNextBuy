@@ -1,21 +1,19 @@
 import { db } from '@/dexie/db';
 import { Wishlist } from '@/dexie/models/Wishlist';
-import { WishlistService } from '../interfaces/WishlistService';
+import { WishlistRepository } from '@/dexie/repo/impl/WishlistRepositoryImpl';
+import { IWishlistService } from '../interfaces/WishlistService';
 
-export interface IWishlistRepository {
-  /** Recupera una wishlist specifica tramite ID */
-  findById(id: number): Promise<Wishlist | undefined>;
+export const WishlistService: IWishlistService = {
+  findByWishlistId: async (wlId: number) => {
+    return await WishlistRepository.findById(wlId);
+  },
 
-  /** Overload 1: Recupera tutte le wishlist senza paginazione */
-  findAll: (options?: { limit: number; page: number }) => Promise<Wishlist[]>;
+  getAll: async () => {
+    return await WishlistRepository.findAll();
+  },
 
-  /** Overload 2: Recupera le wishlist con paginazione */
-  findAll(numOfItems: number, pageNumber: number): Promise<Wishlist[]>;
-
-  /** Crea o aggiorna una wishlist */
-  save(wishlist: Wishlist): Promise<number>;
-
-  /** Altri metodi... */
-  delete(id: number): Promise<void>;
-  deleteItemsByWishlistId(wishlistId: number): Promise<number>;
-}
+  findAllByIds: async (ids: number[]) => {
+    return await WishlistRepository.findAllByIds(ids);
+  },
+  
+};

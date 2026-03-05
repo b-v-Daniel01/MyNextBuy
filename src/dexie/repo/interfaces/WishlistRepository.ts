@@ -10,6 +10,8 @@ export interface IWishlistRepository {
 
   findAllByIds: (id: number[], options?: { limit: number; page: number }) => Promise<Wishlist[]>;
 
+  countAll: () => Promise<number>;
+
   /** Crea o aggiorna una wishlist */
   save: (wl: Wishlist) => Promise<number>;
 

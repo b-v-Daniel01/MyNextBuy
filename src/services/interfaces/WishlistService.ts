@@ -3,8 +3,10 @@ import { WishlistItem } from '@/dexie/models/WishlistItem';
 
 export interface IWishlistService {
   findByWishlistId: (id: number) => Promise<Wishlist | undefined>; // Dexie può ritornare undefined se non trova nulla
-  getAll: () => Promise<Wishlist[]>;
+  findAll: (options?: { limit: number; page: number }) => Promise<Wishlist[]>;
   findAllByIds: (ids: number[]) => Promise<Wishlist[]>;
+
+  countAll: () => Promise<number>;
 
   // Dexie .put() ritorna la chiave primaria (number) dell'oggetto aggiornato/inserito
   save: (wl: Wishlist, wlItems?: WishlistItem[]) => Promise<number>;

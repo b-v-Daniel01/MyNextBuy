@@ -3,6 +3,8 @@ const config = {
   printWidth: 100,
   singleQuote: true,
   trailingComma: 'es5',
+  jsxSelfClosingElement: 'always',
+
   plugins: ['@ianvs/prettier-plugin-sort-imports'],
   importOrder: [
     '.*styles.css$',

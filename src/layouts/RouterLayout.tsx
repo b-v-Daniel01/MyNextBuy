@@ -1,36 +1,25 @@
 import { Outlet } from 'react-router-dom';
-import { AppShell, Burger, Group, Text } from '@mantine/core';
+import { AppShell } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { FooterCentered } from '@/components/footer/Footer';
 import { HeaderMenu } from '@/components/Header/Header';
-import { Navbar } from '../components/navbar/Navbar';
+
+// ... altri import
 
 export function RouterLayout() {
-  // Inizializziamo a 'true' se vogliamo la navbar aperta all'avvio
-  const [opened, { toggle }] = useDisclosure(true);
-
   return (
-    <AppShell
-      header={{ height: 60 }}
-      navbar={{
-        width: 300,
-        breakpoint: 'sm',
-        // 'mobile: !opened' nasconde la navbar su schermi piccoli
-        // 'desktop: !opened' la nasconde su schermi grandi
-        collapsed: { mobile: !opened, desktop: !opened },
-      }}
-      padding="md"
-    >
+    <AppShell header={{ height: 56 }} footer={{ height: 60 }} padding="md" withBorder={false}>
       <AppShell.Header>
         <HeaderMenu />
       </AppShell.Header>
 
-      {/* <AppShell.Navbar>
-        <Navbar closeNavbar={toggle} />
-      </AppShell.Navbar> */}
-
       <AppShell.Main>
         <Outlet />
       </AppShell.Main>
+
+      <AppShell.Footer>
+        <FooterCentered />
+      </AppShell.Footer>
     </AppShell>
   );
 }

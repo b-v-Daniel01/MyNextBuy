@@ -36,9 +36,14 @@ export const WishlistRepository: IWishlistRepository = {
     return await collection.offset(offset).limit(limit).toArray();
   },
 
+  countAll: async () => {
+    // Passiamo le tabelle come array per chiarezza [db.wishlists, db.wishlistItems]
+    return (await db.wishlists.count()) ?? 0;
+  },
+
   save: async (wl: Wishlist) => {
     // Passiamo le tabelle come array per chiarezza [db.wishlists, db.wishlistItems]
-    return await db.wishlists.put(wl);
+    return (await db.wishlists.put(wl)) ?? 0;
   },
 
   delete: async (wl: Wishlist) => {

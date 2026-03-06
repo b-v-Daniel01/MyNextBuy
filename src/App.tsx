@@ -14,8 +14,9 @@ export default function App() {
         <Routes>
           <Route path="/" element={<RouterLayout />}>
             <Route index element={<HomePage />} />
-            <Route path="*" element={<HomePage />} />
+            <Route path="*" element={<HomePage /> } />
             <Route path="wishlists" element={<Wishlists />} />
+            <Route path="wishlists/:id" element={<div>ciao</div>} />
             <Route path="settings/account" element={<div>Account Setting page</div>} />
           </Route>
 

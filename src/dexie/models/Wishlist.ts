@@ -1,5 +1,5 @@
 export interface Wishlist {
-  id?: number;
+  id?: string;
   name: string;
   description: string;
 }

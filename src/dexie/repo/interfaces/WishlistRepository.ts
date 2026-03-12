@@ -1,23 +1,30 @@
 import { Wishlist } from '@/dexie/models/Wishlist';
-import { WishlistItem } from '@/dexie/models/WishlistItem';
 
 export interface IWishlistRepository {
   /** Recupera una wishlist specifica tramite ID */
-  findById: (id: number) => Promise<Wishlist | undefined>;
+  findById: (id: string) => Promise<Wishlist | undefined>;
 
-  /** Recupera tutte le wishlist salvate */
+  /** Recupera tutte le wishlist salvate con paginazione opzionale */
   findAll: (options?: { limit: number; page: number }) => Promise<Wishlist[]>;
 
-  findAllByIds: (id: number[], options?: { limit: number; page: number }) => Promise<Wishlist[]>;
+  /** Recupera un set di wishlist tramite un array di ID */
+  findAllByIds: (ids: string[], options?: { limit: number; page: number }) => Promise<Wishlist[]>;
 
+  /** Conta il numero totale di wishlist */
   countAll: () => Promise<number>;
 
-  /** Crea o aggiorna una wishlist */
-  save: (wl: Wishlist) => Promise<number>;
+  /** Crea o aggiorna una wishlist (ritorna l'ID generato o esistente) */
+  save: (wl: Wishlist) => Promise<string>;
 
-  /** Elimina [una] wishlist */
+  /** Elimina una wishlist specifica */
   delete: (wishlist: Wishlist) => Promise<void>;
+
+  /** Elimina un array di oggetti wishlist */
   deleteAll: (wishlists: Wishlist[]) => Promise<void>;
-  deleteById: (wishlistId: number) => Promise<void>;
-  deleteAllById: (wishlistIds: number[]) => Promise<void>;
+
+  /** Elimina una wishlist tramite il suo ID */
+  deleteById: (wishlistid: string) => Promise<void>;
+
+  /** Elimina più wishlist tramite i loro ID */
+  deleteAllById: (wishlistIds: string[]) => Promise<void>;
 }

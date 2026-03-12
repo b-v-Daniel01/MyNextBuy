@@ -1,35 +1,77 @@
+import { db } from '../../db';
 import { Wishlist } from '../../models/Wishlist';
 import { WishlistItem } from '../../models/WishlistItem';
+import { IWishlistItemRepository } from '../interfaces/WishlistItemRepository';
 
-export interface IWishlistItemRepository {
-  /** Recupera un item specifica tramite ID */
-  findById: (id: number) => Promise<WishlistItem | undefined>;
-  findAllByIds: (
-    ids: number[],
-    options?: { limit: number; page: number }
-  ) => Promise<WishlistItem[] | undefined>;
+export const WishlistItemRepository: IWishlistItemRepository = {
+  findById: async (id: string) => {
+    return await db.wishlistItems.get(id);
+  },
 
-  /** Recupera tutti gli item salvati */
-  findAll: (options?: { limit: number; page: number }) => Promise<WishlistItem[]>;
+  findAll: async (options?: { limit: number; page: number }) => {
+    const collection = db.wishlistItems.toCollection();
+    if (!options) {
+      return await collection.toArray();
+    }
 
-  findItemsByWishlistId: (
-    id: number,
-    options?: { limit: number; page: number }
-  ) => Promise<WishlistItem[]>;
+    const { limit, page } = options;
+    const offset = (page - 1) * limit;
+    return await collection.offset(offset).limit(limit).toArray();
+  },
 
-  findItemsByWishlist: (
-    wl: Wishlist,
-    options?: { limit: number; page: number }
-  ) => Promise<WishlistItem[]>;
+  findAllByIds: async (ids: string[], options?: { limit: number; page: number }) => {
+    const collection = db.wishlistItems.where('id').anyOf(ids);
+    if (!options) {
+      return await collection.toArray();
+    }
 
-  save: (wlItems: WishlistItem) => Promise<number>;
+    const { limit, page } = options;
+    const offset = (page - 1) * limit;
+    return await collection.offset(offset).limit(limit).toArray();
+  },
 
-  saveAll: (wlItems: WishlistItem[]) => Promise<number>;
+  findItemsByWishlistId: async (wishlistId: string, options?: { limit: number; page: number }) => {
+    const collection = db.wishlistItems.where('wishlistId').equals(wishlistId);
+    if (!options) {
+      return await collection.toArray();
+    }
 
-  /** Elimina solo gli item appartenenti a una specifica wishlist */
-  deleteItemsByWishlistId: (wishlistId: number) => Promise<number>;
+    const { limit, page } = options;
+    const offset = (page - 1) * limit;
+    return await collection.offset(offset).limit(limit).toArray();
+  },
 
-  delete: (id: number) => Promise<void>;
+  findItemsByWishlist: async (wl: Wishlist, options?: { limit: number; page: number }) => {
+    if (!wl.id) {
+      return [];
+    }
+    // Riutilizziamo il metodo sopra per evitare duplicazione di logica
+    return await WishlistItemRepository.findItemsByWishlistId(wl.id, options);
+  },
 
-  deleteAll: (id: number[]) => Promise<void>;
-}
+  save: async (wlItem: WishlistItem) => {
+    return (await db.wishlistItems.put(wlItem)) as string;
+  },
+
+  saveAll: async (wlItems: WishlistItem[]) => {
+    // Eseguiamo il salvataggio massivo
+    await db.wishlistItems.bulkPut(wlItems);
+
+    // Poiché l'hook 'creating' ha assegnato gli ID agli oggetti originali,
+    // li restituiamo mappando l'array.
+    return wlItems.map((item) => item.id as string);
+  },
+
+  delete: async (id: string) => {
+    return await db.wishlistItems.delete(id);
+  },
+
+  deleteItemsByWishlistId: async (wishlistId: string) => {
+    // Ritorna il numero di elementi eliminati
+    return await db.wishlistItems.where('wishlistId').equals(wishlistId).delete();
+  },
+
+  deleteAll: async (ids: string[]) => {
+    return await db.wishlistItems.bulkDelete(ids);
+  },
+};

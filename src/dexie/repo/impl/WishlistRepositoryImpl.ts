@@ -1,10 +1,10 @@
 import { Wishlist } from '@/dexie/models/Wishlist';
-import { WishlistItem } from '@/dexie/models/WishlistItem';
 import { db } from '../../db';
 import { IWishlistRepository } from '../interfaces/WishlistRepository';
 
 export const WishlistRepository: IWishlistRepository = {
-  findById: async (id: number) => {
+  findById: async (id: string) => {
+    // .get(id) è il modo più veloce per recuperare tramite Primary Key
     return await db.wishlists.get(id);
   },
 
@@ -15,50 +15,55 @@ export const WishlistRepository: IWishlistRepository = {
       return await collection.toArray();
     }
 
-    //gestione presenza  filtri
     const { limit, page } = options;
     const offset = (page - 1) * limit;
 
     return await collection.offset(offset).limit(limit).toArray();
   },
 
-  findAllByIds: async (ids: number[], options?: { limit: number; page: number }) => {
+  findAllByIds: async (ids: string[], options?: { limit: number; page: number }) => {
+    // anyOf(ids) è corretto per recuperare multipli
     const collection = db.wishlists.where('id').anyOf(ids);
+
     if (!options) {
       return await collection.toArray();
     }
 
-    //gestione presenza  filtri
     const { limit, page } = options;
-
     const offset = (page - 1) * limit;
 
     return await collection.offset(offset).limit(limit).toArray();
   },
 
   countAll: async () => {
-    // Passiamo le tabelle come array per chiarezza [db.wishlists, db.wishlistItems]
-    return (await db.wishlists.count()) ?? 0;
+    return await db.wishlists.count();
   },
 
   save: async (wl: Wishlist) => {
-    // Passiamo le tabelle come array per chiarezza [db.wishlists, db.wishlistItems]
-    return (await db.wishlists.put(wl)) ?? 0;
+    // Dexie.put ritorna la chiave primaria (string in questo caso)
+    // L'UUID viene generato dall'hook nel file db.ts se manca
+    return (await db.wishlists.put(wl)) as string;
   },
 
   delete: async (wl: Wishlist) => {
-    return await db.wishlists.delete(wl.id);
+    if (!wl.id) {
+      throw new Error('ID mancante per la cancellazione');
+    }
+    await db.wishlists.delete(wl.id);
   },
-  deleteById: async (id: number) => {
-    return await db.wishlists.delete(id);
+
+  deleteById: async (id: string) => {
+    await db.wishlists.delete(id);
   },
 
   deleteAll: async (wls: Wishlist[]) => {
-    const keys: number[] = wls.map((element) => element.id);
-    return await db.wishlists.bulkDelete(keys);
+    // Estraiamo gli ID validi e usiamo bulkDelete
+    const ids = wls.map((w) => w.id).filter((id): id is string => !!id);
+    await db.wishlists.bulkDelete(ids);
   },
 
-  deleteAllById: async (ids: number[]) => {
-    return await db.wishlists.bulkDelete(ids);
+  deleteAllById: async (ids: string[]) => {
+    // bulkDelete è molto più performante di where().anyOf().delete()
+    await db.wishlists.bulkDelete(ids);
   },
 };

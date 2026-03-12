@@ -1,16 +1,34 @@
-import { Dexie, type EntityTable } from 'dexie';
+import Dexie, { type EntityTable } from 'dexie';
+import { v4 as uuidv4 } from 'uuid';
 import { Wishlist } from './models/Wishlist';
 import { WishlistItem } from './models/WishlistItem';
 
-const db = new Dexie('myNextBuy') as Dexie & {
-  wishlists: EntityTable<Wishlist, 'id'>;
-  wishlistItems: EntityTable<WishlistItem, 'id'>;
-};
+export class MyDatabase extends Dexie {
+  wishlists!: EntityTable<Wishlist, 'id'>;
+  wishlistItems!: EntityTable<WishlistItem, 'id'>;
 
-// Schema Definition
-db.version(1).stores({
-  wishlists: '++id, name', // Aggiunto indice su name
-  wishlistItems: '++id, wishlistId', // Indice su wishlistId per query rapide
-});
+  constructor() {
+    super('myNextBuy');
 
-export { db };
+    this.version(1).stores({
+      wishlists: 'id, name',
+      wishlistItems: 'id, wishlistId',
+    });
+
+    // Hook per le Wishlist
+    db.wishlists.hook('creating', (_primKey, obj) => {
+      if (!obj.id) {
+        obj.id = uuidv4();
+      }
+    });
+
+    // Hook per i WishlistItems
+    db.wishlistItems.hook('creating', (_primKey, obj) => {
+      if (!obj.id) {
+        obj.id = uuidv4();
+      }
+    });
+  }
+}
+
+export const db = new MyDatabase();

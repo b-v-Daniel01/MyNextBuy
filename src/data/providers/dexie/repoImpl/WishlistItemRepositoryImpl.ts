@@ -1,5 +1,5 @@
-import { Wishlist } from '../../models/Wishlist';
-import { WishlistItem } from '../../models/WishlistItem';
+import { Wishlist } from '@/models/Wishlist';
+import { WishlistItem } from '@/models/WishlistItem';
 
 export interface IWishlistItemRepository {
   /** Recupera un item specifico tramite ID */

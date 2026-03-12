@@ -1,65 +1,74 @@
-import { db } from '@/dexie/db';
-import { Wishlist } from '@/dexie/models/Wishlist';
-import { WishlistItem } from '@/dexie/models/WishlistItem';
-import { WishlistItemRepository } from '@/dexie/repo/impl/WishlistItemRepositoryImpl';
-import { WishlistRepository } from '@/dexie/repo/impl/WishlistRepositoryImpl';
+import { IWishlistRepository } from '@/data/interfaces/WishlistRepository';
+import { IWishlistItemRepository } from '@/data/providers/dexie/repoImpl/WishlistItemRepositoryImpl';
+import { Wishlist } from '@/models/Wishlist';
+import { WishlistItem } from '@/models/WishlistItem';
 import { IWishlistService } from '../interfaces/WishlistService';
 
-export const WishlistService: IWishlistService = {
-  findByWishlistId: async (wlId: number) => {
-    return await WishlistRepository.findById(wlId);
-  },
+export class WishlistService implements IWishlistService {
+  // Definiamo i repository come dipendenze private
+  constructor(
+    private wishlistRepo: IWishlistRepository,
+    private itemRepo: IWishlistItemRepository
+  ) {}
 
-  countAll: async () => {
-    return WishlistRepository.countAll();
-  },
+  findByWishlistId = async (id: string) => {
+    return await this.wishlistRepo.findById(id);
+  };
 
-  findAll: async (options?: { limit: number; page: number }) => {
-    return await WishlistRepository.findAll(options);
-  },
+  countAll = async () => {
+    return await this.wishlistRepo.countAll();
+  };
 
-  findAllByIds: async (ids: number[]) => {
-    return await WishlistRepository.findAllByIds(ids);
-  },
+  findAll = async (options?: { limit: number; page: number }) => {
+    return await this.wishlistRepo.findAll(options);
+  };
 
-  save: async (wl: Wishlist, wlItems?: WishlistItem[]) => {
-    const id: number = await WishlistRepository.save(wl);
+  findAllByIds = async (ids: string[]) => {
+    return await this.wishlistRepo.findAllByIds(ids);
+  };
 
-    if (wlItems) {
-      const wlItemsToSave = wlItems.map((e) => {
-        e.wishlistId = id;
-        return e;
-      });
+  save = async (wl: Wishlist, wlItems?: WishlistItem[]): Promise<string> => {
+    const id = await this.wishlistRepo.save(wl);
 
-      WishlistItemRepository.saveAll(wlItemsToSave);
+    if (wlItems && wlItems.length > 0) {
+      const wlItemsToSave = wlItems.map((item) => ({
+        ...item,
+        wishlistId: id,
+      }));
+
+      await this.itemRepo.saveAll(wlItemsToSave);
     }
 
     return id;
-  },
+  };
 
-  delete: async (wl: Wishlist) => {
-    await WishlistItemRepository.deleteItemsByWishlistId(wl.id);
-    return await WishlistRepository.delete(wl);
-  },
+  delete = async (wl: Wishlist) => {
+    if (!wl.id) {
+      throw new Error('ID mancante');
+    }
+    await this.itemRepo.deleteItemsByWishlistId(wl.id);
+    await this.wishlistRepo.delete(wl);
+  };
 
-  deleteAll: async (wls: Wishlist[]) => {
-    wls.forEach(async (element) => {
-      await WishlistItemRepository.deleteItemsByWishlistId(element.id);
-    });
+  deleteAll = async (wls: Wishlist[]) => {
+    // Usiamo Promise.all perché forEach non aspetta le operazioni async
+    await Promise.all(
+      wls.map(async (wl) => {
+        if (wl.id) {
+          await this.itemRepo.deleteItemsByWishlistId(wl.id);
+        }
+      })
+    );
+    await this.wishlistRepo.deleteAll(wls);
+  };
 
-    return await WishlistRepository.deleteAll(wls);
-  },
+  deleteById = async (id: string) => {
+    await this.itemRepo.deleteItemsByWishlistId(id);
+    await this.wishlistRepo.deleteById(id);
+  };
 
-  deleteById: async (wlId: number) => {
-    await WishlistItemRepository.deleteItemsByWishlistId(wlId);
-    return await WishlistRepository.delete(wl);
-  },
-
-  deleteAllById: async (ids: number[]) => {
-    ids.forEach(async (element) => {
-      await WishlistItemRepository.deleteItemsByWishlistId(element);
-    });
-
-    return await WishlistRepository.deleteAllById(ids);
-  },
-};
+  deleteAllById = async (ids: string[]) => {
+    await Promise.all(ids.map((id) => this.itemRepo.deleteItemsByWishlistId(id)));
+    await this.wishlistRepo.deleteAllById(ids);
+  };
+}

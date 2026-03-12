@@ -18,7 +18,7 @@ import {
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { NewWishlistModal } from '@/components/Wishlist/NewWishlistModal';
-import { Wishlist } from '@/dexie/models/Wishlist';
+import { Wishlist } from '@/models/Wishlist';
 import { WishlistService } from '@/services/implementations/WishlistServiceImpl';
 
 export function Wishlists() {

@@ -1,18 +1,18 @@
-import { Wishlist } from '@/dexie/models/Wishlist';
-import { WishlistItem } from '@/dexie/models/WishlistItem';
+import { Wishlist } from '@/models/Wishlist';
+import { WishlistItem } from '@/models/WishlistItem';
 
 export interface IWishlistService {
-  findByWishlistId: (id: number) => Promise<Wishlist | undefined>; // Dexie può ritornare undefined se non trova nulla
+  findByWishlistId: (id: string) => Promise<Wishlist | undefined>;
   findAll: (options?: { limit: number; page: number }) => Promise<Wishlist[]>;
-  findAllByIds: (ids: number[]) => Promise<Wishlist[]>;
+  findAllByIds: (ids: string[]) => Promise<Wishlist[]>; // Cambiato in string[]
 
   countAll: () => Promise<number>;
 
-  // Dexie .put() ritorna la chiave primaria (number) dell'oggetto aggiornato/inserito
-  save: (wl: Wishlist, wlItems?: WishlistItem[]) => Promise<number>;
+  /** Ritorna l'ID (string) della wishlist salvata */
+  save: (wl: Wishlist, wlItems?: WishlistItem[]) => Promise<string>;
 
   delete: (wishlist: Wishlist) => Promise<void>;
   deleteAll: (wishlists: Wishlist[]) => Promise<void>;
-  deleteById: (wishlistId: number) => Promise<void>;
-  deleteAllById: (wishlistIds: number[]) => Promise<void>;
+  deleteById: (wishlistid: string) => Promise<void>;
+  deleteAllById: (wishlistIds: string[]) => Promise<void>; // Cambiato in string[]
 }

@@ -1,6 +1,5 @@
 import { Outlet } from 'react-router-dom';
 import { AppShell } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
 import { FooterCentered } from '@/components/footer/Footer';
 import { HeaderMenu } from '@/components/Header/Header';
 

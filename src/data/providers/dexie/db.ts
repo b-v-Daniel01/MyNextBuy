@@ -1,7 +1,7 @@
 import Dexie, { type EntityTable } from 'dexie';
 import { v4 as uuidv4 } from 'uuid';
-import { Wishlist } from './models/Wishlist';
-import { WishlistItem } from './models/WishlistItem';
+import { Wishlist } from '@/models/Wishlist';
+import { WishlistItem } from '@/models/WishlistItem';
 
 export class MyDatabase extends Dexie {
   wishlists!: EntityTable<Wishlist, 'id'>;

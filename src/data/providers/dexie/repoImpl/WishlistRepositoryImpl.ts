@@ -1,6 +1,5 @@
-import { Wishlist } from '@/dexie/models/Wishlist';
-import { db } from '../../db';
-import { IWishlistRepository } from '../interfaces/WishlistRepository';
+import { IWishlistRepository } from '@/data/interfaces/WishlistRepository';
+import { db } from '../db';
 
 export const WishlistRepository: IWishlistRepository = {
   findById: async (id: string) => {

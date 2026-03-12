@@ -1,4 +1,4 @@
-import { Wishlist } from '@/dexie/models/Wishlist';
+import { Wishlist } from '@/models/Wishlist';
 
 export interface IWishlistRepository {
   /** Recupera una wishlist specifica tramite ID */

@@ -16,9 +16,15 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
+    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@test-utils": ["./test-utils"]
+      "@test-utils": ["./test-utils"],
+      "@/models/*": ["./src/models/*"],
+      "@/data/*": ["./src/data/*"],
+      "@/services/*": ["./src/services/*"],
+      "@/dexieRepo/*": ["./src/data/providers/dexie/repo/*"],
+      "@/providers/*": ["./src/data/providers/*"]
     }
   },
   "include": ["src", "test-utils", ".storybook/main.ts", ".storybook/preview.tsx"]

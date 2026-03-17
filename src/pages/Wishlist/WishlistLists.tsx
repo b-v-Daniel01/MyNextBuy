@@ -1,10 +1,7 @@
-import { useEffect, useState } from 'react';
-import { IconEdit, IconNewSection, IconPencil, IconPlus, IconTrashOff } from '@tabler/icons-react';
-import { render, waitFor } from '@test-utils';
+import { useCallback, useEffect, useState } from 'react';
+import { IconEdit, IconNewSection, IconTrashOff } from '@tabler/icons-react';
 import {
   ActionIcon,
-  Button,
-  ButtonGroup,
   Card,
   Group,
   Modal,
@@ -12,22 +9,24 @@ import {
   Select,
   Skeleton,
   Stack,
-  Text,
   Title,
   Tooltip,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { NewWishlistModal } from '@/components/Wishlist/NewWishlistModal';
+import { useWishlist } from '@/contexts/DataContextProvider';
 import { Wishlist } from '@/models/Wishlist';
-import { WishlistService } from '@/services/implementations/WishlistServiceImpl';
 
 export function Wishlists() {
   const [loading, setLoading] = useState(true);
+
+  const { wishlistService } = useWishlist();
 
   //PAGER
   const [activePage, setActivePage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState('20');
   const [totalPages, setTotalPages] = useState(1);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selected, setSelected] = useState();
   const [modalOpened, { open, close }] = useDisclosure(false);
 
@@ -35,61 +34,38 @@ export function Wishlists() {
   const [listWl, setListWl] = useState<Wishlist[]>([]);
 
   //aggiornamento lista wishlist
-  useEffect(() => {
-    const fetchWishlists = async () => {
-      setLoading(true);
-
-      try {
-        const options = {
-          limit: parseInt(itemsPerPage, 10),
-          page: activePage,
-        };
-        const data = await WishlistService.findAll(options);
-
-        // Assumendo che tu debba calcolare anche il totalPages qui
-        setListWl(data);
-        const numOfWishl = await WishlistService.countAll();
-        const tp = Math.ceil(numOfWishl / parseInt(itemsPerPage, 10));
-        setTotalPages(tp);
-      } catch (error) {
-        console.error('Errore:', error);
-        setListWl([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchWishlists();
-  }, [activePage, itemsPerPage]);
+  // Caricamento iniziale e al cambio pagina/limite
 
   const handleClose = async () => {
-    close(); // Chiama la funzione ritornata da useDisclosure
-    await refreshWishlist(); // Assicurati che faccia il fetch
+    close();
+    await refreshWishlist();
   };
 
-  const refreshWishlist = async () => {
-    const options = {
-      limit: parseInt(itemsPerPage, 10),
-      page: activePage,
-    };
-    const data = await WishlistService.findAll(options);
-    // Assumendo che tu debba calcolare anche il totalPages qui
-    setListWl(data);
+  const refreshWishlist = useCallback(async () => {
+    setLoading(true);
 
-    const numOfWishl = await WishlistService.countAll();
-    const tp = Math.ceil(numOfWishl / parseInt(itemsPerPage, 10));
-    setTotalPages(tp);
-  };
+    try {
+      const options = {
+        limit: parseInt(itemsPerPage, 10),
+        page: activePage,
+      };
 
-  //aggiornamento totalpages
+      const data = await wishlistService.findAll(options);
+      const totalItems = await wishlistService.countAll();
+
+      setListWl(data);
+      setTotalPages(Math.ceil(totalItems / parseInt(itemsPerPage, 10)));
+    } catch (error) {
+      console.error('Errore nel caricamento:', error);
+      setListWl([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [activePage, itemsPerPage, wishlistService]);
+
   useEffect(() => {
-    const setPages = async () => {
-      const numOfWishl = await WishlistService.countAll();
-      const tp = Math.ceil(numOfWishl / parseInt(itemsPerPage, 10));
-      setTotalPages(tp);
-    };
-    setPages();
-  }, [itemsPerPage, listWl]);
+    refreshWishlist();
+  }, [refreshWishlist]);
 
   const skeletons = Array.from({ length: 5 }).map((_, i) => (
     <Skeleton key={i} height={100} w={700} radius="md">

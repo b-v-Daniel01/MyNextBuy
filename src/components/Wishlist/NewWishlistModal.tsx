@@ -1,9 +1,14 @@
-import { Button, Group, Stack, TextInput, Title } from '@mantine/core';
+import { Button, TextInput, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { Wishlist } from '@/dexie/models/Wishlist';
-import { WishlistService } from '@/services/implementations/WishlistServiceImpl';
+import { useWishlist } from '@/contexts/DataContextProvider';
+import { Wishlist } from '@/models/Wishlist';
 
-export function NewWishlistModal({ onSuccess }) {
+interface NewWishlistModalProps {
+  onSuccess: () => void;
+}
+export function NewWishlistModal({ onSuccess }: NewWishlistModalProps) {
+  const { wishlistService } = useWishlist();
+
   const form = useForm<Wishlist>({
     initialValues: {
       name: '',
@@ -18,7 +23,7 @@ export function NewWishlistModal({ onSuccess }) {
   });
 
   const handleSubmit = async (values: Wishlist) => {
-    await WishlistService.save(values);
+    await wishlistService.save(values);
     console.log('saved');
     onSuccess();
   };

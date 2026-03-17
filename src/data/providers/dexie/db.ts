@@ -16,14 +16,14 @@ export class MyDatabase extends Dexie {
     });
 
     // Hook per le Wishlist
-    db.wishlists.hook('creating', (_primKey, obj) => {
+    this.wishlists.hook('creating', (_primKey, obj) => {
       if (!obj.id) {
         obj.id = uuidv4();
       }
     });
 
     // Hook per i WishlistItems
-    db.wishlistItems.hook('creating', (_primKey, obj) => {
+    this.wishlistItems.hook('creating', (_primKey, obj) => {
       if (!obj.id) {
         obj.id = uuidv4();
       }
